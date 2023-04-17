@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from std_msgs.msg import String
 
@@ -20,12 +21,13 @@ class MinimalPublisher(Node):
 
 
 def main():
+    rclpy.init()
+    minimal_publisher = MinimalPublisher()
     try:
-        rclpy.init()
-        minimal_publisher = MinimalPublisher()
         rclpy.spin(minimal_publisher)
-    except KeyboardInterrupt:
-        minimal_publisher.destroy_node()
+    except (KeyboardInterrupt, ExternalShutdownException):
+        print('Cleaning up everythin, please wait...')
+    else:
         rclpy.shutdown()
 
 

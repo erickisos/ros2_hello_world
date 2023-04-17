@@ -1,6 +1,6 @@
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-
 from std_msgs.msg import String
 
 
@@ -10,19 +10,19 @@ class MinimalSubscriber(Node):
         self.subscription = self.create_subscription(
             String, 'topic', self.listener_callback, 10
         )
-        self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
         self.get_logger().info(f'I heard: "{msg.data}"')
 
 
-def main(args=None):
+def main():
+    rclpy.init()
+    minimal_subscriber = MinimalSubscriber()
     try:
-        rclpy.init(args=args)
-        minimal_subscriber = MinimalSubscriber()
         rclpy.spin(minimal_subscriber)
-    except KeyboardInterrupt:
-        minimal_subscriber.destroy_node()
+    except (KeyboardInterrupt, ExternalShutdownException):
+        print('Cleaning up everythin, please wait...')
+    else:
         rclpy.shutdown()
 
 
